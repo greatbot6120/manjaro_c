@@ -25,9 +25,9 @@ int catValue; //global variable outside the function or block, accessible for al
 void aSimpleFunction() {
 	int runningCat; //local variable
 	static int anotherCatValue; //static varibale will retain its value between multiple function calls
-	auto int autoVarCat; /* all variables that are declared inside the block, are automatic variables 
-						  * by default. We can explicity declare an automatic variable using auto keyword
-						  */
+	auto int autoVarCat; 	/* all variables that are declared inside the block, are automatic variables 
+							 * by default. We can explicity declare an automatic variable using auto keyword
+						  	 */
 }
 ```
 
