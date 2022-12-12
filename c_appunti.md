@@ -464,6 +464,60 @@ float wrongArr[dimension];
 
 > Questo metodo di costruzione non è standard ANSI C 89, spesso infatti si ricorre alla direttiva di precompilazione `define` per dichiarare la dimensione di un array.
 
+**Esercizio** » Chiedere all'utente di inserire un array di interi (dimensione definita da `effectiveController`) ed un numero intero `integerFlag`. Il programma salva gli elementi inseriti in `arrOne` e copia tutti gli elementi di `arrOne` che sono maggiori di `integerFlag` in un secondo vettore `arrTwo`. La copia deve avvenire nella parte iniziale di `arrTwo` senza lasciare buchi.
+
+```c
+#include <stdio.h>
+
+#define ARR_ELEMENTS 30
+
+int main(int argc, char* argv[]) {
+
+    int arrOne[ARR_ELEMENTS], arrTwo[ARR_ELEMENTS], effectiveController = 10, 
+        integerFlag, indexLoop, subIndexLoop = 0;
+     
+
+    printf("Inserire l'integer flag: ");
+    scanf("%d", &integerFlag);
+
+    /* riempimento di entrambi gli array*/
+    for(indexLoop = 0; indexLoop < effectiveController; indexLoop++) {
+
+        printf("\nInserire l'elemento dell'indice %d: ", indexLoop);
+        scanf("%d", &arrOne[indexLoop]);
+
+        /* condizione di riempimento del secondo array*/
+        if(arrOne[indexLoop] > integerFlag) {
+
+            arrTwo[subIndexLoop] = arrOne[indexLoop];
+            subIndexLoop++;
+        }
+    }
+
+    /* stampa array */
+    printf("\n[ ");
+
+    for(indexLoop = 0; indexLoop < effectiveController; indexLoop++) {
+
+        printf("%d  ", arrOne[indexLoop]);
+    }
+
+    printf("]\n");
+    printf("\n[ ");
+
+    for(indexLoop = 0; indexLoop < subIndexLoop; indexLoop++) {
+
+        printf("%d  ", arrTwo[indexLoop]);
+    }
+
+    printf("]\n");
+
+
+
+    return 0;
+}
+```  
+
 
 
 
