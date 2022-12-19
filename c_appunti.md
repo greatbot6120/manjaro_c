@@ -1,5 +1,18 @@
 # C89 Notes
 
+## Table of contents
+
+* [Built-in Types](#built-in)
+* [Operatori aritmetici](#operatori-aritmetici)
+* [Istruzioni ingresso ed uscita](#istruzioni-ingresso-ed-uscita)
+* [Struttura di un programma in C](#struttura-di-un-programma-in-c)
+* [Operatori ed espressioni logiche](#operatori-ed-espressioni-logiche)
+* [Costanti](#costanti)
+* [Array](#array)
+    * [Array di caratteri e stringhe](#array-di-caratteri-e-stringhe)
+    * [Array multidimensionali](#array-multidimensionali)
+    * [Struct vs Array](#struct-vs-array)
+
 ## Built-in Types
 
 I data types predefiniti di C89 sono:
@@ -516,8 +529,129 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-```  
+```
 
+### Array di caratteri e stringhe
+
+In c le stringhe sono realizzate mediante array di caratteri. La differenza fra una stringa ed un array di caratteri è il terminatore della stringa `'\0'`. Se mi viene chiesto di gestire stringhe al più `N` caratteri devo allocare un vettore con dimensione `N+1`.
+
+```c
+#define N 50
+
+char firstAnswer[N + 1];
+``` 
+
+> Viene definito un array di `50` caratteri di tipo `char` più un `'\0'` che rappresenta la fine della stringa. NB: non esiste il tipo predefinito `string`.
+
+Una modalità di riempimento dell'array di caratteri per creare una stringa può avvenire tramite un ciclo `for` (anche se non funziona e bugga) o tramite `scanf()`.
+
+```c
+#define N 100
+
+char randomString[N];
+
+/* primo metodo */
+scanf("%s\n", randomString);
+
+/* secondo metodo */
+scanf("%[^\n]", randomString);
+
+printf("%s\n", randomString);
+```
+
+> Il primo metodo acquisisce la stringa fino al primo spazio mentre mentre nel secondo metodo acquisisce fino all'inserimento del primo invio. NB: `randomString` è l'indirizzo del primo elemento `&randomString[0]`, `scanf()` quindi non ha bisogno della `&`. Entrambi delimitano automaticamente la parte significativa dal terminatore `'\0'`.
+
+É possibile calcolare la lunghezza di una stringa con un ciclo usando la flag `'\0'`:
+
+```c
+char randomString[30];
+int countChar = 0;
+
+scanf("%[^\n]", randomString);
+
+while(randomString[countChar] != '\0') {countChar++;}
+
+printf("Lunghezza stringa: %d\n", countChar);
+
+```
+
+Un metodo più semplice è utilizzare la funzione `strlen()`, contenuta nella libreria `string`:
+
+```c
+#include <string.h> /* !! importare libreria !! */
+
+int countChar = strlen(randomString);
+```
+
+**Esercizio** » Verificare se due stringhe coincidono per lunghezza e se coincidono per ogni elemento.
+
+```c
+#include <stdio.h>
+#include <stdlib.h> /* libreria per exit() */
+#include <string.h> /* libreria per strlen() */
+
+#define C 100
+
+int main(int argc, char* argv[]) {
+
+    char firstString[C], secondString[C];
+    int arrChecker, flag;
+
+    printf("Inserire due stringhe: ");
+    scanf("%[^\n] %[^\n]", firstString, secondString);
+
+    /* confronto lunghezza */
+    if( strlen(firstString) == strlen(secondString) ) {
+
+        /* confronto indice per indice */
+        for(arrChecker = 0; arrChecker < ((int) strlen(firstString)); arrChecker++) {
+
+            if(firstString[arrChecker] != secondString[arrChecker]) {
+
+                printf("Stringhe lunghe uguali ma diversi caratteri\n");
+                exit(0);
+            }
+        }
+
+        printf("Stringhe identiche, %d caratteri\n", (int) strlen(firstString));
+    
+    } else {
+
+        printf("Stringhe diverse!\n");
+    }
+
+    return 0;
+}
+```
+
+É possibile eseguire la copia del contenuto di un array ad un altro chiamando `strcpy()` con gli array come argomenti. Il primo argomento è l'array copiato, mentre il secondo argomento è l'array copiante. Per accodare le stringhe si usa `strcat()`; ha lo stesso verso degli argomenti come per copiare.
+
+### Array multidimensionali
+
+Si possono definire array con più di una dimensione mediante il classico costruttore array.
+
+```c
+int randomMatrix[10][12];
+char matrixWords[3][20];
+int triMatrix[21][15][4];
+``` 
+
+### Struct vs Array
+
+Gli array aggregano variabili omogenee in una sequenza precisa. Le `struct` permettono di aggregare variabili eterogenee in una sola variabile ed è una sorta di "contenitore" per variabili disomogenee di tipi più semplici. Le variabili aggregate nella struct sono dette campi della struct.
+
+Sintassi dello `struct`:
+
+```c
+struct {
+
+    keywordTipoUno nomeCampoUno;
+    keywordTipoDue nomeCampoDue;
+
+    keywordTipoN nomeCampoN;
+    
+} nomeStruct;
+```
 
 
 
