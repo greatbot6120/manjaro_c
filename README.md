@@ -123,6 +123,20 @@ int main(int argc, char* argv[]) {
 |`&&`|AND|○|
 |`\|\|`|OR|○|
 
+La precedenza degli operatori è la seguente: `! + - &` > `* / %` > `< <= >= >` > `== !=` > `&&` > `||` > `=`. É possibile inoltre fare un assegnazione di tipo logico alle variabili in modo tale che una volta mettendo solamente il valore della variabile in un'unica espressione caratterizzata solamente dall'identifier della variabile, vale che per ogni valore diverso da zero assegnatovi l'espressione è vera.
+
+```c
+int flag;
+
+flag = 0; /* falso */
+flag = 1; /* vero */
+flag = 25; /* vero */
+flag = 239; /* vero */
+flag = (23 > 21) /* vero */
+```
+
+>NB: da usare solo con le variabili di tipo `int`.
+
 Durante la costruzione di tabelle di verità si noti che per *n* variabili logiche si hanno 2<sup><em>n</em></sup> righe. Di seguito le tabelle di verità delle espressioni logiche elementari:
 
 **NOT**
@@ -378,7 +392,7 @@ switch(integerExpression) {
 }
 ```
 
-> `integerExpression` può essere anche un carattere e non solo `int`. Si noti inoltre come ogni label del `case` finisca con i due punti `:` e non col punto e virgola `;`. Per evitare l'esecuzione a cascata alla prima corrispondenza trovata, occorre inserire alla fine degli statements di ogni case la keyword `break`. Il `default` è opzionale, se nessuno degli altri casi viene matchato il `default` viene eseguito se è presente nel sorgente. Il `break` può essere utilizzato non solo negli `switch case` ma anche nei costrutti iterativi elementari come `while`, `do while` e `for`.
+> `integerExpression` può essere anche un carattere (e non altro) e non solo `int`. Si noti inoltre come ogni label del `case` finisca con i due punti `:` e non col punto e virgola `;`. Per evitare l'esecuzione a cascata alla prima corrispondenza trovata, occorre inserire alla fine degli statements di ogni case la keyword `break`. Il `default` è opzionale, se nessuno degli altri casi viene matchato il `default` viene eseguito se è presente nel sorgente. Il `break` può essere utilizzato non solo negli `switch case` ma anche nei costrutti iterativi elementari come `while`, `do while` e `for`.
 
 Utilizzo delle keyword `break` e `continue` nei costrutti iterativi elementari:
 
@@ -652,6 +666,27 @@ struct {
     
 } nomeStruct;
 ```
+
+## Sottoprogrammi
+
+I sottoprogrammi venogono definiti per tipo che returnano o se non returnano alcun tipo. Le variabili locali definite in un sottoprogramma restano inglobate nel sottoprogramma a meno che non ne venga esportato il valore con una istruzione `return`. Non è violazione di standard balzare la function prototype mettendo in stack i sottoprogrammi prima del main in modo tale che il compilatore conosca già la pre-definition dei vari sottoprogrammi.
+
+```c
+double anotherSubProgram(double callerOne) {/* definizione */}
+void reimbursement_calc(void) {/* definizione */}
+
+int main(int argc, char* argv[]) {
+
+    double numOne;
+
+    reimbursement_calc();
+    anotherSubProgram(numOne);
+    
+    return 0;
+} 
+```
+
+
 
 
 
