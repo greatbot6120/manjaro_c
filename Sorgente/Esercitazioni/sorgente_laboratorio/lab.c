@@ -6,7 +6,7 @@
 
 void troncabile_primo_dx(void) {
 
-    int num, indexLoop;
+    int num, troncabile;
     
     do {
 
@@ -15,21 +15,28 @@ void troncabile_primo_dx(void) {
 
     } while(num <= 0);
 
-    for(indexLoop = 0; indexLoop ) {
+    do {
+    
+        if( ((num != 2) && (num != 3) && (num != 5) && (num != 7)) ) {
+
+            if( ((num % 2) != 0) && ((num % 3) != 0) && ((num % 5) != 0) && ((num % 7) != 0) ) {
+
+                troncabile = 1;
+            } else {
+                troncabile = 0;
+            }
+
+        } else {
+
+            troncabile = 1;
+        }
 
         num = num / BASE;
-    }
+
+    } while(num > 0);
+
+    printf("%d\n", troncabile);
 }
-
-
-
-
-
-
-
-
-
-
 
 void super_mario(void) {
 
