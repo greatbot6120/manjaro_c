@@ -4,6 +4,47 @@
 #define BASE 10
 #define BLOCK '#'
 
+void triangolo_tartaglia(void) {
+
+    int ampiezza, indexLoop;
+    int triangle[BASE];
+    
+    do {
+
+        printf("Inserire l'ampiezza del triangolo di Tartaglia (massimo 10) => ");
+        scanf("%d", &ampiezza);
+
+    } while( (ampiezza <= 0) || (ampiezza >= 10) );
+
+    for(indexLoop = 0; indexLoop < BASE ; indexLoop++) {
+
+        triangle[indexLoop] = 0;
+        printf("%d ", triangle[indexLoop]);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void troncabile_primo_dx(void) {
 
     int num, troncabile;
@@ -47,7 +88,7 @@ void super_mario(void) {
         printf("Inserire un valore intero non superiore a 16 => ");
         scanf("%d", &heightPiramid);
     
-    } while(heightPiramid < 0 && heightPiramid > 16);
+    } while(heightPiramid < 0 || heightPiramid > 16);
 
     heightPiramidController = heightPiramid;
 
@@ -133,7 +174,8 @@ int main(int argc, char* argv[]) {
 
     /*padding_numbers();*/
     /*super_mario();*/
-    troncabile_primo_dx();
+    /*troncabile_primo_dx();*/
+    triangolo_tartaglia();
 
     return 0;
 }

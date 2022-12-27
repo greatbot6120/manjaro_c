@@ -12,6 +12,7 @@
     * [Array di caratteri e stringhe](#array-di-caratteri-e-stringhe)
     * [Array multidimensionali](#array-multidimensionali)
     * [Struct vs Array](#struct-vs-array)
+* [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
 
 ## Built-in Types
 
@@ -685,6 +686,92 @@ int main(int argc, char* argv[]) {
     return 0;
 } 
 ```
+
+## Puntatori e programmazione modulare
+
+```c
+float temp;
+float *point = &temp; /* salva l'indirizzo di temp nel puntatore point */
+```
+
+> Identifica `point` come una variabile puntatore, in particolare un puntatore a `float`. Questo significa che possiamo memorizzare l'indirizzo di memoria di una variabile di tipo `float` in `point`.
+
+Vari utilizzi dei pointers anche con i files che non ho voglia di spiegare, *let the code explains itself*:
+
+```c
+#include <stdio.h>
+#include <math.h>
+
+void separate(double valueToAnalyze, double *fracP, char *signP, int *wholeP) {
+
+    if(valueToAnalyze < 0) {
+
+        *signP = '-';
+
+    } else if(valueToAnalyze == 0) {
+
+        *signP = ' ';
+
+    } else {
+
+        *signP = '+';
+
+    }
+
+    *wholeP = floor(fabs(valueToAnalyze));
+    *fracP = fabs(valueToAnalyze) - floor(fabs(valueToAnalyze));
+}
+
+void separate_value() {
+
+    double value, frac;
+    char sign;
+    int whole;
+
+    printf("Inserire un valore da analizzare => ");
+    scanf("%lf", &value);
+
+    separate(value, &frac, &sign, &whole);
+
+    printf("Parts of %.4f\n Sign: %c\n Whole number magnitude: %d\n Fractional part: %.4f\n"
+            , value, sign, whole, frac);
+}
+
+void files_read_n_write(void) {
+
+    FILE *fWritePointer;
+    FILE *fReadPointer;
+    char myLine[100];
+
+    fWritePointer = fopen("writingFile.txt", "w");
+    fReadPointer = fopen("anotherFile.txt", "r");
+
+    /* write to a file */
+    fprintf(fWritePointer, "HOLA SOY DORA\n");
+
+    /* reading from a file */
+    while(!feof(fReadPointer)) {
+        
+        fgets(myLine, 100, fReadPointer);
+        puts(myLine);
+    }
+
+    fclose(fReadPointer);
+    fclose(fWritePointer);
+}
+
+int main(int argc, char* argv[]) {
+
+        /*files_read_n_write();*/
+        separate_value();
+
+
+    return 0;
+}
+```
+
+
+
 
 
 
