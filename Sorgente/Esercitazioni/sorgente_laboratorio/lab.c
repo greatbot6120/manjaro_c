@@ -1,49 +1,57 @@
 #include <stdio.h>
 #include <math.h>
 
-#define BASE 10
+#define BASE 15
 #define BLOCK '#'
 
 void triangolo_tartaglia(void) {
 
-    int ampiezza, indexLoop;
-    int triangle[BASE];
-    
+    int triangle[BASE][BASE], indexLoop, subIndexLoop, amp;
+
+    for(indexLoop = 0; indexLoop < BASE; indexLoop++) {
+
+        for(subIndexLoop = 0; subIndexLoop < BASE; subIndexLoop++) {
+
+            if( (indexLoop == subIndexLoop) || (subIndexLoop == 0) ) {
+                
+                triangle[indexLoop][subIndexLoop] = 1;
+
+            } else {
+
+                triangle[indexLoop][subIndexLoop] = 0;
+            }
+        }
+    }
+
+    for(indexLoop = 1; indexLoop < BASE; indexLoop++) {
+
+        for(subIndexLoop = 1; subIndexLoop < BASE; subIndexLoop++) {
+
+                triangle[indexLoop + 1][subIndexLoop] = triangle[indexLoop][subIndexLoop] + triangle[indexLoop][subIndexLoop - 1];
+        }
+    }
+
     do {
 
-        printf("Inserire l'ampiezza del triangolo di Tartaglia (massimo 10) => ");
-        scanf("%d", &ampiezza);
+        printf("Scegliere l'ampiezza del triangolo di Tartaglia (massimo 10) => ");
+        scanf("%d", &amp);
 
-    } while( (ampiezza <= 0) || (ampiezza >= 10) );
+    } while(amp < 0 || amp > BASE);
 
-    for(indexLoop = 0; indexLoop < BASE ; indexLoop++) {
+    for(indexLoop = 0; indexLoop < amp; indexLoop++) {
+        
+        for(subIndexLoop = 0; subIndexLoop < amp; subIndexLoop++) {
 
-        triangle[indexLoop] = 0;
-        printf("%d ", triangle[indexLoop]);
+            if(triangle[indexLoop][subIndexLoop] != 0) {
+
+            printf("[%d] ", triangle[indexLoop][subIndexLoop]);
+            
+            }
+        }
+
+        printf("\n");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void troncabile_primo_dx(void) {
 
