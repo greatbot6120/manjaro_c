@@ -1,8 +1,45 @@
 #include <stdio.h>
 #include <math.h>
+#include <string.h>
 
+#define LIMIT 50
 #define BASE 15
 #define BLOCK '#'
+
+void string_rotation(void) {
+
+    char firstSequence[LIMIT], secondSequence[LIMIT];
+    int slider, indexLoop, subIndexLoop, length;
+
+    printf("Inserire una stringa di massimo 50 caratteri => ");
+    scanf("%s", firstSequence);
+    
+    length = strlen(firstSequence);
+
+    do {
+
+        printf("Inserire lo slider (dev'essere minore della lunghezza della stringa) => ");
+        scanf("%d", &slider);
+
+    } while (slider > length);
+
+    for(indexLoop =  length - slider , subIndexLoop = 0; indexLoop < length; indexLoop++, subIndexLoop++) {
+
+            secondSequence[subIndexLoop] = firstSequence[indexLoop];
+    }
+
+    for(subIndexLoop = 0; subIndexLoop < length - slider; subIndexLoop++) {
+        
+        secondSequence[subIndexLoop + slider] = firstSequence[subIndexLoop];
+    }
+    
+    for(subIndexLoop = 0; subIndexLoop < length; subIndexLoop++) {
+
+        printf("%c", secondSequence[subIndexLoop]);
+    }
+
+    printf("\n");
+}
 
 void triangolo_tartaglia(void) {
 
@@ -183,7 +220,8 @@ int main(int argc, char* argv[]) {
     /*padding_numbers();*/
     /*super_mario();*/
     /*troncabile_primo_dx();*/
-    triangolo_tartaglia();
+    /*triangolo_tartaglia();*/
+    string_rotation();
 
     return 0;
 }
