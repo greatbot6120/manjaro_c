@@ -6,6 +6,68 @@
 #define BASE 15
 #define BLOCK '#'
 
+int extract_value_sum(const int *arraySum, int *kPointer, int *indexLooP) {
+
+    int exit_sum_status = 0, mainIndex, subIndex, next;
+
+    for(mainIndex = 0; mainIndex < *indexLooP; mainIndex++) {
+
+        for(next = 1; mainIndex < *indexLooP; next++) {
+
+            if((arraySum[mainIndex] + arraySum[mainIndex + next]) == *kPointer) {
+
+                exit_sum_status = 1;
+                break;
+
+            }
+        } 
+    }
+
+    return (exit_sum_status);
+}
+
+void find_sum(void) {
+
+    int container[LIMIT], indexLoop, k;
+
+    printf("Inserire l'elemento k => ");
+    scanf("%d", &k);
+
+    for(indexLoop = 0; indexLoop < LIMIT; indexLoop++) {
+
+        printf("Inserire elemento N. %d => ", indexLoop + 1);
+        scanf("%d", &container[indexLoop]);
+
+        if(container[indexLoop] < 0 || container[indexLoop] == 0) {
+            
+            indexLoop--;
+            break;
+        }
+    }
+
+    printf("%d\n", extract_value_sum(container, &k, &indexLoop));
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void string_rotation(void) {
 
     char firstSequence[LIMIT], secondSequence[LIMIT];
@@ -221,7 +283,8 @@ int main(int argc, char* argv[]) {
     /*super_mario();*/
     /*troncabile_primo_dx();*/
     /*triangolo_tartaglia();*/
-    string_rotation();
+    /*string_rotation();*/
+    find_sum();
 
     return 0;
 }
