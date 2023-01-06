@@ -11,7 +11,8 @@
 * [Array](#array)
     * [Array di caratteri e stringhe](#array-di-caratteri-e-stringhe)
     * [Array multidimensionali](#array-multidimensionali)
-    * [Struct vs Array](#struct-vs-array)
+* [Struct](#struct)
+    * [Dichiarazione Struct](#dichiarazione-struct)
 * [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
 
 ## Built-in Types
@@ -639,7 +640,14 @@ int main(int argc, char* argv[]) {
 }
 ```
 
-É possibile eseguire la copia del contenuto di un array ad un altro chiamando `strcpy()` con gli array come argomenti. Il primo argomento è l'array copiato, mentre il secondo argomento è l'array copiante. Per accodare le stringhe si usa `strcat()`; ha lo stesso verso degli argomenti come per copiare.
+É possibile eseguire la copia del contenuto di un array ad un altro chiamando `strcpy()` con gli array come argomenti. Il primo argomento è l'array copiato, mentre il secondo argomento è l'array copiante. Per accodare le stringhe si usa `strcat()`; ha lo stesso verso degli argomenti come per copiare. Per acquisire interattiva di una stringa completa di testo si può utilizzare la funzione di libreria `gets()` per ovviare alle limitazioni sui separatori possedute da `scanf()`. I sottoprogrammi citati in questo paragrafo fanno parte della liberia `string` a parte `scanf()` e `gets()` che fanno parte di `stdio`.
+
+```c
+char myCoolLine[80];
+
+printf("Type something cool => ");
+gets(myCoolLine);
+```
 
 ### Array multidimensionali
 
@@ -651,22 +659,79 @@ char matrixWords[3][20];
 int triMatrix[21][15][4];
 ``` 
 
-### Struct vs Array
+## Struct
 
 Gli array aggregano variabili omogenee in una sequenza precisa. Le `struct` permettono di aggregare variabili eterogenee in una sola variabile ed è una sorta di "contenitore" per variabili disomogenee di tipi più semplici. Le variabili aggregate nella struct sono dette campi della struct.
 
-Sintassi dello `struct`:
-
 ```c
-struct {
+struct nomeStruttura{
 
-    keywordTipoUno nomeCampoUno;
+    keywordTipoUno nomeCampoUno, sameTypeField, anotherField;
     keywordTipoDue nomeCampoDue;
-
+    ...
     keywordTipoN nomeCampoN;
     
-} nomeStruct;
+};
 ```
+
+>É possibile inoltre dichiarare una o più variabili dalla stessa struttura con al fondo `} nomeUno, nomeDue, ... ;`. NB: una struttura non può avere come membri variabili che hanno come tipo la struttura stessa ma può contenere puntatori a tali variabili.
+
+```c
+struct anotherStructure {
+
+    keyword base1, membroDue;
+    struct anotherStructure membroUno; /* ERRORE */
+    struct anotherStructure *membroUno; /* OK */
+};
+```
+### Dichiarazione Struct
+
+la dichiarazione alloca spazio di memoria a differenza della sola definizione del tipo strutturato e come con i datatype builtin di C si può inizializzare in modo separato.
+
+```c
+struct dataContainer {
+
+    ...
+
+} mazzo[32], data, copy, *cartaP;
+```
+
+L'inizializzazione di una `struct` può avvenire in modo completo o separando dichiarazione ed inizializzazione come detto in precedenza
+
+```c
+/* comleta */
+struct dataContainer data = {"name", "Surname", 25};
+
+/* mediante assegnamento di variabili struct */
+struct dataContainer data = {"name", "Surname", 25};
+struct dataContainer copy = data;
+
+/* inizializzazione separata */
+struct dataContainer data;
+data.name = "Morty";
+data.surname = "Mortimer";
+...
+```
+
+### Accesso alle struct
+
+Può avvenire per accesso diretto o tramite puntatore. Nel primo caso si utlizza l'operatore punto `.` come utilizzato nel'esempio di codice precedente e tramite un puntatore si utilizza l'operatore freccia `->`.
+
+```c
+/* accesso diretto */
+struct dataContainer data;
+printf("%s", data.surname);
+
+/* accesso via puntatore */
+struct dataContainer *dataPointer = &data;
+printf("%s", dataPointer->name);
+```
+>`dataPointer->name` e `(*dataPointer).name` sono equivalenti.
+
+Si può passare una struttura interamente o solo i singoli membri. Utilizzando il metodo classico si usa l'operatore `.` mentre se si passano le strutture per riferimento si deve passare l'indirizzo della variabile `struct` (`&`) e la funzione riceve come parametro formale un puntatore alla variabile `struct`.
+
+
+
 
 ## Sottoprogrammi
 
@@ -768,6 +833,12 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+```
+
+Sintassi di inizializzazione di un array di puntatori:
+
+```c
+char *strP[10]; 
 ```
 
 

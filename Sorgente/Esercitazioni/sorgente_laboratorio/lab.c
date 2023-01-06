@@ -6,6 +6,18 @@
 #define BASE 15
 #define BLOCK '#'
 
+
+
+
+
+
+
+
+
+
+
+
+
 int extract_value_sum(const int *arraySum, int *kPointer, int *indexLooP) {
 
     int exit_sum_status = 0, mainIndex, subIndex, next;
@@ -47,26 +59,6 @@ void find_sum(void) {
 
     printf("%d\n", extract_value_sum(container, &k, &indexLoop));
 } 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 void string_rotation(void) {
 
@@ -284,7 +276,7 @@ int main(int argc, char* argv[]) {
     /*troncabile_primo_dx();*/
     /*triangolo_tartaglia();*/
     /*string_rotation();*/
-    find_sum();
-
+    /*find_sum();*/
+    
     return 0;
 }
