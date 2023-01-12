@@ -13,7 +13,11 @@
     * [Array multidimensionali](#array-multidimensionali)
 * [Struct](#struct)
     * [Dichiarazione Struct](#dichiarazione-struct)
+    * [Tipi di dato User-Defined](#tipi-di-dato-user-defined)
 * [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
+* [Files](#files)
+    * [Binary files write and read](#binary-files-write-and-read) 
+* [Allocazione dinamica stack e heap](#allocazione-dinamica-stack-e-heap)
 
 ## Built-in Types
 
@@ -728,7 +732,36 @@ printf("%s", dataPointer->name);
 ```
 >`dataPointer->name` e `(*dataPointer).name` sono equivalenti.
 
-Si può passare una struttura interamente o solo i singoli membri. Utilizzando il metodo classico si usa l'operatore `.` mentre se si passano le strutture per riferimento si deve passare l'indirizzo della variabile `struct` (`&`) e la funzione riceve come parametro formale un puntatore alla variabile `struct`.
+Si può passare una struttura interamente o solo i singoli membri. Utilizzando il metodo classico si usa l'operatore `.` mentre se si passano le strutture per riferimento si deve passare l'indirizzo della variabile `struct` (`&`) e la funzione riceve come parametro formale un puntatore alla variabile `struct`. NB: per riassegnare valori stringa in una `struct` devo ricorrere a `strcpy()`.
+
+### Tipi di dato User-Defined
+
+le keyword `typedef` permette di definire nuovi tipi di C. La dichiarazione di nuovi tipi va prima del `main()`. Qualche esempio:
+
+```c
+/* */
+
+#define LEN_STR 20
+#define NUM_PIANI 20 
+#define NUM_UFFICI 40
+
+typedef struct {
+
+    char name[LEN_STR + 1], surname[LEN_STR + 1];
+    int mortgage;
+    int index;
+} Worker;
+
+typedef struct {
+
+    int surface;
+    int exposition;
+    Worker occuping;
+} Office;
+
+Office tower[NUM_PIANI][NUM_UFFICI];
+
+```
 
 
 
@@ -840,6 +873,148 @@ Sintassi di inizializzazione di un array di puntatori:
 ```c
 char *strP[10]; 
 ```
+
+Scorrimento array tramite puntatori:
+
+```c
+#include <stdio.h>
+
+#define LIMIT 10
+
+int main(int argc, char* argv[]) {
+
+    int addresses[LIMIT] = {23, 324, 12, 76, 321, 43, 45, 98, 109, 34}, indexLoop;
+    
+    for(indexLoop = 0; indexLoop < LIMIT; indexLoop++) {
+
+        printf("Contenuto con indice %d\t Con puntatore %d\n", addresses[indexLoop], *(addresses + indexLoop));
+    }
+
+    return 0;
+}
+```
+
+## Files
+
+Per utilizzare i file nel linguaggio C è necessario dichiarare un puntatore al suo descrittore, aprire e poi chiudere lo stream. Nell'apertura riceve una stringa che contiene in nome del file da aprire
+
+```c
+/* dichiarazione */
+FILE *someText
+
+/* apertura in scrittura */
+someText = fopen("myFile.txt", "w");
+
+/* scrittura con controllo */
+if(someText) {
+
+    fprintf(someText, "my cool and awesome line");
+}
+
+/* chiusura */
+fclose(someText);
+```
+
+Utilizzando `fscanf()` che legge da file la sintassi è la stessa dello `scanf()` classico a parte l'aggiunta del puntatore al primo parametro. Se non ci sono più valori da leggere nel file il sottoprogramma restituisce `EOF` (cioè -1). Possiamo utilizzare come controller di ciclo la funzione `feof(someText)` (`someText` o qualsiasi altro puntatore a file) per determinare la fine del file; il sottoprogramma restituisce 1 se abbiamo raggiunto la fine del file, altrimenti zero. NB: possiamo utilizzare come espressione di controllo `!feof(someText)` o anche sfruttando il valore di `fscanf()`: `fprintf(someText, "my cool and awesome line") > 0`.
+
+### Binary files write and read
+
+I binary files occupano meno spazio dei `*.txt` e sono più veloci. La sintassi per scrivere e leggere un binary file si differenziano poichè con i binary usiamo i sottoprogrammi `fwrite()` e `fread()`.
+
+```c
+int arr[10] = {...};
+FILE *binFile;
+
+binFile = fopen("myBinFile.bin", "wb");
+
+if(binFile) {
+
+    /* il terzo parametro è quante volte devo scrivere l'oggetto */
+    fwrite(arr, sizeof(int), 1, binFile);
+}
+
+fclose(binFile)
+```
+>`fread()` ha la stessa sintassi con qualche differenza ovvero la stringa di lettura invece che di scrittura per esempio. Di seguito un esercizio di esempio di utilizzo dei binary files.
+
+```c
+#include <stdio.h>
+
+#define LIMIT 500
+
+int main(int argc, char* argv[]) {
+    
+    int arrBin[LIMIT], readFrom[LIMIT], indexLoop;
+    FILE *binWrite, *binRead;
+
+    for(indexLoop = 0; indexLoop < LIMIT; indexLoop++) {
+
+        arrBin[indexLoop] = indexLoop * 2;
+    }
+
+    binWrite = fopen("valuesWrite.bin", "wb");
+
+    if(binWrite) {
+
+        fwrite(arrBin, sizeof(arrBin), 1, binWrite);
+    }
+
+    fclose(binWrite);
+
+    binRead = fopen("valuesWrite.bin", "rb");
+
+    if(binRead) {
+
+        fread(readFrom, sizeof(readFrom), 1, binRead);
+    }
+
+    for(indexLoop = 0; indexLoop < LIMIT; indexLoop++) {
+
+        printf("[%d] ", readFrom[indexLoop]);
+    }
+    
+    return 0;
+}
+```
+
+Tabella argomenti `fopen()`:
+
+|File access mode string|Meaning|Explanation|Action if file already exists|Action if file does not exist|
+|--|--|--|--|--|
+|`"r"`|read|Open a file for reading|read from start|failure to open|
+|`"w"`|write|Create a file for writing|destroy contents|create new|
+|`"a"`|append|Append to a file|write to end|create new|
+|`"r+"`|read extended|Open a file for read/write|read from start|error|
+|`"w+"`|write extended|Create a file for read/write|destroy contents|create new|
+|`"a+"`|append extended|Open a file for read/write|write to end|create new| 
+
+## Allocazione dinamica stack e heap 	 	 	 	
+ 	 	 	 	
+In C è possibile allocare dinamicamente uno spazio di memoria in un area denominata heap tramite il sottoprogramma `malloc()` contenuto nella libreria `stdlib.h`: `tipo *p = malloc (size)` (controllare p con un `if` che non sia `NULL`) ed è buona prassi castare nel tipo che ci interessa la chiamata a `malloc()` dato che è un puntatore a `void` in questo modo: `(int*) malloc(size)`; `size` è la quantità di memoria da allocare ed è in genere espressa come `n*sizeof(tipo)`. Nella stessa libreria per deallocare dello spazio di memoria non più necessario si utilizza `free(indirizzo)`. La `calloc()` prende come parametri il numero di elementi e la dimensione di un singolo elemento. La principale differenza fra `malloc()` e `calloc()` è che la seconda quando riserva la memoria nello heap va ad azzerare ogni cella prima di restituire il puntatore. La chiamata a `realloc()` prende come parametri l'array a cui vogliamo cambiare la dimensione e la nuova dimensione totale in byte ovvero sempre `n*sizeof(tipo)`.  
+
+```c
+#include <stdlib.h>
+
+int numElem = 20;
+
+/* alloco spazio e casto nel tipo che mi interessa */
+int *custom = (int*) malloc(numElem * sizeof(int));
+
+/*
+ * alloco spazio e azzero le celle. primo parametro numero 
+ * elementi e secondo parametro size del singolo tipo
+ */
+int *custom = (int*) calloc(numElem, sizeof(int));
+
+/* modifico la dimensione di custom */
+int *custom = (int*) realloc(custom, 12 * sizeof(int));
+
+/* lo usiamo un po' come fclose() */
+free(custom);
+```
+
+
+
 
 
 
