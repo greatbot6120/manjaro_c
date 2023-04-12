@@ -6,18 +6,6 @@
 #define BASE 15
 #define BLOCK '#'
 
-
-
-
-
-
-
-
-
-
-
-
-
 int extract_value_sum(const int *arraySum, int *kPointer, int *indexLooP) {
 
     int exit_sum_status = 0, mainIndex, subIndex, next;
