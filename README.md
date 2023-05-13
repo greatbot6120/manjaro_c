@@ -15,6 +15,7 @@
     * [Dichiarazione Struct](#dichiarazione-struct)
     * [Tipi di dato User-Defined](#tipi-di-dato-user-defined)
 * [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
+    * [Aritmetica dei puntatori](#aritmetica-dei-puntatori)
 * [Files](#files)
     * [Binary files write and read](#binary-files-write-and-read) 
 * [Allocazione dinamica stack e heap](#allocazione-dinamica-stack-e-heap)
@@ -804,7 +805,7 @@ void separate(double valueToAnalyze, double *fracP, char *signP, int *wholeP) {
 
     if(valueToAnalyze < 0) {
 
-        *signP = '-';
+        *signP = '-'
 
     } else if(valueToAnalyze == 0) {
 
@@ -831,8 +832,7 @@ void separate_value() {
 
     separate(value, &frac, &sign, &whole);
 
-    printf("Parts of %.4f\n Sign: %c\n Whole number magnitude: %d\n Fractional part: %.4f\n"
-            , value, sign, whole, frac);
+    printf("Parts of %.4f\n Sign: %c\n Whole number magnitude: %d\n Fractional part: %.4f\n", value, sign, whole, frac);
 }
 
 void files_read_n_write(void) {
@@ -873,6 +873,15 @@ Sintassi di inizializzazione di un array di puntatori:
 ```c
 char *strP[10]; 
 ```
+### Aritmetica dei puntatori
+
+In C sono possibili le operazioni aritmetiche sui puntatori, ad esempio nel caso in cui dovessimo incrementare il nostro pointer di `+ 1` l'indirizzo a cui punterebbe sarà alla prossima cella di memoria seguente. La quantità `int` risultante aggiunta sarà in relazione al data type del puntatore a cui stiamo sommando. Di conseguenza il puntatore sarà incrementato della dimensione del data type a cui punta, valore che può essere recuperato tramite la funzione di libreria `sizeof(type_pointer)`.
+
+```c
+newAddress = *point + (i * sizeof(int))
+```
+
+> `i` indica il numero di incremento del pointer. Si può anche scrivere solo `*(point + 1)` per accedere nella cella dopo di memoria, in questo modo possiamo incrementare di x posizioni.
 
 Scorrimento array tramite puntatori:
 

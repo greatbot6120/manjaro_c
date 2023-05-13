@@ -222,7 +222,7 @@ void padding_numbers(void) {
     /* check for the correct values */
     do {
 
-        printf("Inserire due numeri interi strettamente positivi => ");
+        printf("Inserire due numeri interi strettamente positivi >> ");
         scanf("%d%d", &num, &k);
 
     } while( (num < 0) || (k < 0) );
