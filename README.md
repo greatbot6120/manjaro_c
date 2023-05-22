@@ -11,7 +11,8 @@
 * [Array](#array)
     * [Array di caratteri e stringhe](#array-di-caratteri-e-stringhe)
     * [Array multidimensionali](#array-multidimensionali)
-* [Struct](#struct)
+    * [Ricorsione](#ricorsione)
+* [Strutture e Unioni](#strutture-e-unioni)
     * [Dichiarazione Struct](#dichiarazione-struct)
     * [Tipi di dato User-Defined](#tipi-di-dato-user-defined)
 * [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
@@ -77,12 +78,12 @@ printf("\n %d + %d = %d", a, b, a + b);
 
 |Stringa di controllo|Descrizione|Carattere di stampa|Carattere di conversione|
 |--|--|:--:|:--:|
-|`\n`|Carriage return|○|
-|`\t`|Tab|○|
-|`%d`|Intero decimale||○|
-|`%f`|Numero reale||○|
-|`%c`|Carattere||○|
-|`%s`|Sequenza di caratteri (stringa)||○|
+|`\n`|Carriage return|°|
+|`\t`|Tab|°|
+|`%d`|Intero decimale||°|
+|`%f`|Numero reale||°|
+|`%c`|Carattere||°|
+|`%s`|Sequenza di caratteri (stringa)||°|
 
 ## Struttura di un programma in C
 
@@ -122,13 +123,13 @@ int main(int argc, char* argv[]) {
 
 |Operatore|Descrizione|Operatore logico|Operatore relazionale|
 |--|--|:--:|:--:|
-|`==`|Equal to||○|
-|`!=`|Not equal to||○|
-|`>` `>=`|Greater, greater and equal||○|
-|`<` `<=`|Less, less and equal||○|
-|`!`|NOT|○|
-|`&&`|AND|○|
-|`\|\|`|OR|○|
+|`==`|Equal to||°|
+|`!=`|Not equal to||°|
+|`>` `>=`|Greater, greater and equal||°|
+|`<` `<=`|Less, less and equal||°|
+|`!`|NOT|°|
+|`&&`|AND|°|
+|`\|\|`|OR|°|
 
 La precedenza degli operatori è la seguente: `! + - &` > `* / %` > `< <= >= >` > `== !=` > `&&` > `||` > `=`. É possibile inoltre fare un assegnazione di tipo logico alle variabili in modo tale che una volta mettendo solamente il valore della variabile in un'unica espressione caratterizzata solamente dall'identifier della variabile, vale che per ogni valore diverso da zero assegnatovi l'espressione è vera.
 
@@ -513,7 +514,7 @@ int main(int argc, char* argv[]) {
 
     printf("Inserire l'integer flag: ");
     scanf("%d", &integerFlag);
-
+>
     /* riempimento di entrambi gli array*/
     for(indexLoop = 0; indexLoop < effectiveController; indexLoop++) {
 
@@ -664,7 +665,144 @@ char matrixWords[3][20];
 int triMatrix[21][15][4];
 ``` 
 
-## Struct
+### Ricorsione
+
+- Uno o più casi base hanno soluzione immediata e non ricorsiva
+- Tutti gli altri casi possono essere ridefiniti in funzione di problemi che siano più vicini ai casi base.
+- Applicando questo processo di ridefinizione viene chiamato il sottoprogramma ricorsivo: alla fine il problema si riduce alla semplice soluzione di un caso base.
+
+Di solito gli algoritmi ricorsivi utilizzano un costrutto condizionale strutturato nel modo seguente:
+
+```
+Se questo è un caso base {
+
+    risolvilo
+
+} Altrimenti {
+
+    Ridefinisci il problema utilizzando la ricorsione
+}
+```
+
+Prendiamo un esempio semplice di moltiplicazione, dobbiamo moltiplicare `6 * 3`, ipotizzando di avere la tabellina delle somme e non delle moltiplicazioni. Inoltre sappiamo che l'elemento neutro nella moltiplicazione è `1`, quindi se ci imbattiamo nel caso base di moltiplicazione per `1`, siamo in grado di risolverlo. Il problema principale può essere scomposto in sue sottoproblemi:
+
+1.  Moltiplica 6 per 2
+2.  Somma 6 al risultato del problema 1
+
+Conoscendo solo la tabellina delle somme, possiamo risolvere il problema 2 ma non il problema 1. Notando bene il primo problema ora è più vicino al caso base di quanto lo fosse il problema iniziale e possiamo scomporre il problema 1 in un dei sottoproblemi analoghi a questi di prima.
+
+1.  Moltiplica 6 per 2
+    1.1 Moltiplica 6 per 1
+    1.2 Somma 6 al risultato del problema 1.1
+2.  Somma 6 al risultato del problema 1.
+
+In codice:
+
+```c
+#include <stdio.h>
+
+int ricMultiply(int m, int n) {
+
+    int res;
+
+    /* caso base */
+    if(n == 1) {
+
+        res = m;
+
+    } else {
+
+        /* passo ricorsivo */
+        res = m + ricMultiply(m, n - 1);
+    }
+
+    return(res);
+}
+
+int main(int argc, const char* argv[]) {
+
+    printf("%d\n", ricMultiply(6, 3));
+
+    return (0);
+}
+```
+
+Altro esempio spiegato di utilizzo di ricorsione in questo caso per trovare quanto volte un carattere è presente in una stringa:
+
+```c
+#include <stdio.h>
+
+int count(char ch, char* str) {
+  
+    int res;
+  
+    if(str == '\0') {
+    
+        res = 0;  
+  
+    } else {
+    
+        if(ch == str[0]) {  
+    
+            res = 1 + count(ch, &str[1]);
+      
+        } else {
+        
+            res = count(ch, &str[1]);  
+        } 
+    }
+
+    return(res); 
+}
+
+
+int main(int argc, char* argv[]) {
+  
+    char str[] = {"POSSESSOPALLE"};
+    char target = 'S';
+  
+    printf("%d\n", count(target, str));
+}
+```
+
+>NB: nel sottoprogramma `count()` si può notare come non si utilizzi un indice nella chiamata ricorsiva. Si utilizza un costrutto del genere: `&str[1]` che potrebbe essere all'inizio controintuitivo poichè può sembrare che ci stiamo riferendo sempre alla stessa cella di memoria, ovvero la quella con indice `[1]`. Invece si noti come nella chiamata ricorsiva si utilizzi l'ndirizzo corrente iniziale di zero riferendoci alla cella di memoria successiva. Nella chiamata a venire, l'indirizzo `&str[1]` memorizzerà nel puntatore `const char* str` l'indirizzo della cella subito accanto, poichè non stiamo lavorando sull'indirizzo dell'array originale poichè non sarebbe in linea con le regole della visibilità delle variabili locali definite dal linguaggio C, ma stiamo lavorando al puntatore della cella che viene richiamato ogni volta sull'indirizzo seguente e non chiaramente sull'indirizzo globale `[1]` come si potrebbe pensare.
+
+Altro esercizio sulla ricorsione:
+
+```c
+/*
+    Scrivere una funzione ricorsiva che calcola la somma di tutti gli interi
+    compresi tra due argomenti passati come parametri.
+*/
+
+#include <stdio.h>
+
+int sumBetween(int a, int b) {
+
+    if(a == b) {
+
+        return (a);
+
+    } else {
+
+        return (a + sumBetween(a + 1, b));
+    }
+}
+
+void wrapper(void) {
+
+    printf("%d\n", sumBetween(3, 12));
+}
+
+int main() {
+
+    wrapper();
+
+    return(0);
+}
+```
+
+## Strutture e Unioni
 
 Gli array aggregano variabili omogenee in una sequenza precisa. Le `struct` permettono di aggregare variabili eterogenee in una sola variabile ed è una sorta di "contenitore" per variabili disomogenee di tipi più semplici. Le variabili aggregate nella struct sono dette campi della struct.
 
@@ -705,10 +843,12 @@ L'inizializzazione di una `struct` può avvenire in modo completo o separando di
 
 ```c
 /* comleta */
-struct dataContainer data = {"name", "Surname", 25};
+struct dataContainer data = {"Kevin", "Malone", 25};
 
-/* mediante assegnamento di variabili struct */
-struct dataContainer data = {"name", "Surname", 25};
+/* con questa inizializzazione si possono mettere anche in un ordine diverso */
+struct dataContainer data = {.name = "Kevin", .surname = "Malone", .age = 25};
+
+/* memory copy */
 struct dataContainer copy = data;
 
 /* inizializzazione separata */
@@ -716,6 +856,23 @@ struct dataContainer data;
 data.name = "Morty";
 data.surname = "Mortimer";
 ...
+```
+
+Quando una struct viene passata come parametro in ingresso ad un sottoprogramma, tutti i valori dei suoi campi vengono copiati nel corrispondente parmetro formale del sottoprogramma. NB: differentemente dai tipi di dato strutturati come gli array, i quali non possono essere utilizzati come valore di ritorno di un sottoprogramma, le struct possono invece essere ritornate.
+
+```c
+planet_t get_planet(void) {
+
+    planet_t planet;
+
+    scanf("%s%lf%d%lf%lf", planet.name,
+                           &planet.diameter,
+                           &planet.moons,
+                           &planet.orbit_time,
+                           &planet.rotation_time);
+    
+    return(planet);
+}
 ```
 
 ### Accesso alle struct
@@ -761,8 +918,45 @@ typedef struct {
 } Office;
 
 Office tower[NUM_PIANI][NUM_UFFICI];
-
 ```
+
+### Array di Struct
+
+Il modo per creare questo particolare tipo di strutture è definire un tipo strutturato che collezioni le informazioni riguardanti il settore di dati di interesse e poi dichiarare un array di quel tipo.
+
+```c
+#define MAX_STU 50
+#define NUM_PTS 10
+
+typedef struct {
+
+    int id;
+    double avg;
+
+} student_t;
+
+typedef struct {
+
+    double x, y;
+
+} point_t;
+
+...
+
+{
+    student_t stuList[MAX_STU];
+    point_t polygon[MAX_PTS];
+```
+
+> Per accedere ai vari campi ad esempio `stuList`, i dati del primo studento saranno nella struttura `stuList[0]`, i cui campi sono `stuList[0].id` e `stuList[0].avg`. Esempio nella tabella:
+
+|`index`|`.id`|`.avg`|
+|--|--|--|
+|`stuList[0]`|`645189864`|`29.3`|
+|`stuList[1]`|`987456561`|`25.9`|
+|`stuList[...]`|`...`|`...`|
+|`stuList[49]`|`146454546`||
+
 
 
 
