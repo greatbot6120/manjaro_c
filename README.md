@@ -14,12 +14,15 @@
     * [Ricorsione](#ricorsione)
 * [Strutture e Unioni](#strutture-e-unioni)
     * [Dichiarazione Struct](#dichiarazione-struct)
+    * [Accesso alle struct](#accesso-alle-struct)
     * [Tipi di dato User-Defined](#tipi-di-dato-user-defined)
+    * [Array di Struct](#array-di-struct)
 * [Puntatori e programmazione modulare](#puntatori-e-programmazione-modulare)
     * [Aritmetica dei puntatori](#aritmetica-dei-puntatori)
 * [Files](#files)
     * [Binary files write and read](#binary-files-write-and-read) 
 * [Allocazione dinamica stack e heap](#allocazione-dinamica-stack-e-heap)
+* [Programmazione in grande](#programmazione-in-grande)
 
 ## Built-in Types
 
@@ -900,7 +903,7 @@ le keyword `typedef` permette di definire nuovi tipi di C. La dichiarazione di n
 /* */
 
 #define LEN_STR 20
-#define NUM_PIANI 20 
+#define NUM_PIANI 20 Accesso alle struct
 #define NUM_UFFICI 40
 
 typedef struct {
@@ -955,7 +958,22 @@ typedef struct {
 |`stuList[0]`|`645189864`|`29.3`|
 |`stuList[1]`|`987456561`|`25.9`|
 |`stuList[...]`|`...`|`...`|
-|`stuList[49]`|`146454546`||
+|`stuList[49]`|`146454546`|`28.5`|
+
+### Unioni
+
+Le unioni sono molto simili alle struct poichè il formato della definizione di unione è analoga a quella della struttura.
+
+```c
+typedef union {
+
+    int x, y;
+    char z[32];
+
+} Data;
+```
+
+Questo tipo ha in alternativa dentro l'unione `x` o `y` o `z[32]` e dispone la memoria in base al dato più grande, in questo caso `z[32]`. Quindi la differenza principale fra le Union e le Struct è che le prime predispongono lo spazio solamente per uno solo dei membri di quella struttura, che si riferisce al dato di dimensione più grande.
 
 
 
@@ -1120,6 +1138,57 @@ fclose(someText);
 
 Utilizzando `fscanf()` che legge da file la sintassi è la stessa dello `scanf()` classico a parte l'aggiunta del puntatore al primo parametro. Se non ci sono più valori da leggere nel file il sottoprogramma restituisce `EOF` (cioè -1). Possiamo utilizzare come controller di ciclo la funzione `feof(someText)` (`someText` o qualsiasi altro puntatore a file) per determinare la fine del file; il sottoprogramma restituisce 1 se abbiamo raggiunto la fine del file, altrimenti zero. NB: possiamo utilizzare come espressione di controllo `!feof(someText)` o anche sfruttando il valore di `fscanf()`: `fprintf(someText, "my cool and awesome line") > 0`.
 
+Esempio di backup di creazione di un file per fare il backup di un file esistente:
+```c
+#include <stdio.h>
+#define STR_SIZE 80
+
+void backup(void) {
+
+    char single_c, in_name[STR_SIZE], out_name[STR_SIZE];
+    FILE *in, *out;
+
+    printf("Enter name of file you want to backup >> ");
+
+    /* si acquisisce il nome del file da copiare e aprirlo in lettura */
+    for( scanf("%s", in_name); (in = fopen(in_name, "r")) == NULL; scanf("%s", in_name) ) {
+
+        printf("Cannot open file %s, for input\nRe-enter file name >> ", in_name);
+    }
+
+    printf("Enter name for the backup copy >> ");
+
+    /* si acquisisce il nome del file su cui fare il backup */
+    for( scanf("%s", out_name); (out = fopen(out_name, "w")) == NULL; scanf("%s", out_name) ) {
+        
+        printf("Cannot open file %s, for output\nRe-enter file name >> ", out_name);
+    }
+
+    /* copia un carattere alla volta */
+    for( single_c = getc(in); single_c != EOF; single_c = getc(in) ) {
+
+        putc(single_c, out);
+    }
+
+    fclose(in);
+    fclose(out);
+
+    printf("Copied %s to %s.\n", in_name, out_name);
+
+}
+
+int main() {
+
+    backup();
+
+    return (0);
+}
+```
+
+
+
+
+
 ### Binary files write and read
 
 I binary files occupano meno spazio dei `*.txt` e sono più veloci. La sintassi per scrivere e leggere un binary file si differenziano poichè con i binary usiamo i sottoprogrammi `fwrite()` e `fread()`.
@@ -1215,6 +1284,28 @@ int *custom = (int*) realloc(custom, 12 * sizeof(int));
 /* lo usiamo un po' come fclose() */
 free(custom);
 ```
+
+## Programmazione in grande
+
+Un modo per riutilizzare il codice è organizzarlo in delle librerie personali attraverso i file di intestazione che solitamente includiamo nel codice per utilizzare dei sottoprogrammi di libreria come ad esempio `ctype.h`. Le caratteristiche principali che deve avere un file di intestazione sono dei blocchi che commentano la funzionalità della libreria e che spieghino la finalità e funzionalità dei vari sottoprogrammi, delle direttive `#define` per definire le macro costanti cosicchè possano essere utilizzate dal programma e prima delle definizioni dei prototipi delle funzioni si utilizza la convenzione `extern` e ciò indica al compilatore che la definizione del sottoprogramma in quel file di intestazione verrà fornita al linker.
+
+```c
+extern int n_arrcpy(int *dest, const int *src);
+```
+
+Nella direttiva al preprocessore `#include` abbiamo finora sempre usato le parentesi angolari (`< >`) per includere i file di intestazione contenuti nella libreria standard di C. Per indicare al preprocessore un file di intestazione custom si utilizzano le virgolette per indicare che la libreria è stata creata dal programmatore: `#include "customlib.h"`. Nelle macro costanti inoltre è importante precedere oltre al nome stesso anche il nome della libreria o comunque differenziare da macro costanti di altre librerie che possono avere un nome simile se non uguale così da evitare dei conflitti. Esempio:
+
+```c
+/* arrUtils.h */
+#define ARR_UTILS_MAX_SIZE 40
+```
+
+
+
+
+
+
+
 
 
 
