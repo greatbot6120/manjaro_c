@@ -22,7 +22,14 @@
 * [Files](#files)
     * [Binary files write and read](#binary-files-write-and-read) 
 * [Allocazione dinamica stack e heap](#allocazione-dinamica-stack-e-heap)
+    * [Allocazione dinamica di un array](#allocazione-dinamica-di-un-array)
+    * [Liste concatenate](#liste-concatenate)
 * [Programmazione in grande](#programmazione-in-grande)
+    * [Variabili globali](#variabili-globali)
+    * [Classi di memorizzazione static e register](#classi-di-memorizzazione-static-e-register)
+    * [Compilazione condizionale](#compilazione-condizionale)
+    * [Passare parametri al programma principale](#passare-parametri-al-programma-principale)
+    * [Definire macro costanti con parametri](#definire-macro-costanti-con-parametri)
 
 ## Built-in Types
 
@@ -517,7 +524,7 @@ int main(int argc, char* argv[]) {
 
     printf("Inserire l'integer flag: ");
     scanf("%d", &integerFlag);
->
+
     /* riempimento di entrambi gli array*/
     for(indexLoop = 0; indexLoop < effectiveController; indexLoop++) {
 
@@ -900,7 +907,6 @@ Si può passare una struttura interamente o solo i singoli membri. Utilizzando i
 le keyword `typedef` permette di definire nuovi tipi di C. La dichiarazione di nuovi tipi va prima del `main()`. Qualche esempio:
 
 ```c
-/* */
 
 #define LEN_STR 20
 #define NUM_PIANI 20 Accesso alle struct
@@ -974,10 +980,6 @@ typedef union {
 ```
 
 Questo tipo ha in alternativa dentro l'unione `x` o `y` o `z[32]` e dispone la memoria in base al dato più grande, in questo caso `z[32]`. Quindi la differenza principale fra le Union e le Struct è che le prime predispongono lo spazio solamente per uno solo dei membri di quella struttura, che si riferisce al dato di dimensione più grande.
-
-
-
-
 
 ## Sottoprogrammi
 
@@ -1185,10 +1187,6 @@ int main() {
 }
 ```
 
-
-
-
-
 ### Binary files write and read
 
 I binary files occupano meno spazio dei `*.txt` e sono più veloci. La sintassi per scrivere e leggere un binary file si differenziano poichè con i binary usiamo i sottoprogrammi `fwrite()` e `fread()`.
@@ -1262,28 +1260,57 @@ Tabella argomenti `fopen()`:
 
 ## Allocazione dinamica stack e heap 	 	 	 	
  	 	 	 	
-In C è possibile allocare dinamicamente uno spazio di memoria in un area denominata heap tramite il sottoprogramma `malloc()` contenuto nella libreria `stdlib.h`: `tipo *p = malloc (size)` (controllare p con un `if` che non sia `NULL`) ed è buona prassi castare nel tipo che ci interessa la chiamata a `malloc()` dato che è un puntatore a `void` in questo modo: `(int*) malloc(size)`; `size` è la quantità di memoria da allocare ed è in genere espressa come `n*sizeof(tipo)`. Nella stessa libreria per deallocare dello spazio di memoria non più necessario si utilizza `free(indirizzo)`. La `calloc()` prende come parametri il numero di elementi e la dimensione di un singolo elemento. La principale differenza fra `malloc()` e `calloc()` è che la seconda quando riserva la memoria nello heap va ad azzerare ogni cella prima di restituire il puntatore. La chiamata a `realloc()` prende come parametri l'array a cui vogliamo cambiare la dimensione e la nuova dimensione totale in byte ovvero sempre `n*sizeof(tipo)`.  
+In C è possibile allocare dinamicamente uno spazio di memoria in un area denominata heap tramite il sottoprogramma `malloc()` contenuto nella libreria `stdlib.h`. L'utilizzo dell'operatore `sizeof` applicato al tipo di dato da memorizzare nel blocco dinamico restituisce il numero di byte richiesti da un dato del tipo specificato, quindi `malloc(sizeof(int))` alloca esattamente lo spazio necessario per memorizzare un valore di tipo `int` e restituisce un puntatore al blocco appena allocato, o meglio il suo indirizzo. Quando si lavora con i puntatori si ha a che fare con "puntatori a un tipo di dato specifico", e non semplicemente con "puntatori" e quindi occorre effettuare un il cast al tipo specifico di dato che ci interessa per convertire il tipo di dato `(void *)` del valore restituito dal sottoprogramma `malloc()`.
+Di seguito si riportano degli esempi:
 
 ```c
-#include <stdlib.h>
+nump = (int *) malloc(sizeof(int));
+letp = (char *) malloc(sizeof(char));
 
-int numElem = 20;
-
-/* alloco spazio e casto nel tipo che mi interessa */
-int *custom = (int*) malloc(numElem * sizeof(int));
-
-/*
- * alloco spazio e azzero le celle. primo parametro numero 
- * elementi e secondo parametro size del singolo tipo
- */
-int *custom = (int*) calloc(numElem, sizeof(int));
-
-/* modifico la dimensione di custom */
-int *custom = (int*) realloc(custom, 12 * sizeof(int));
-
-/* lo usiamo un po' come fclose() */
-free(custom);
+/* struttura */
+planetp = (planet_t *) malloc(sizeof(planet_t));
 ```
+
+>La regione in cui vengono allocati i nuovi blocchi è un'area di memoria conosciuta come heap ed è separata dallo stack (o pila di sistema) la quale è l'area di memoria in cui viene allocato lo spazio per i sottoprogrammi quando vengono invocati, e che viene ripulita non appena questi terminano.
+
+Per effettuare l'accesso ad un campo di una struttura allocata dinamicamente si utilizza la stessa sintassi che abbiamo usato per accedere ai campi di una struttura avendo noti i puntatori del paragrafo Strutture ([link](#strutture-e-unioni)). 
+
+### Allocazione dinamica di un array
+
+Per creare dinamicamente un array di elementi utilizziamo il sottoprogramma `calloc()` definito nella libreria `stdlib.h`. Il sottoprogramma `calloc()` riceve due parametri, il numero di elementi richiesti e la dimensione di ogni elemento, e si occupa di inizializzare tali elementi a zero.
+
+```c
+int *arrOfNums, size;
+
+printf("Enter how many numbers you want in the array >> ");
+scanf("%d", &size);
+
+arrOfNums = (int *) calloc(size, sizeof(int));
+```
+
+Per ripulire le celle nello heap si utilizza una chiamata a `free()` mettendo come argomento la cella che dev'essere liberata, per esempio `free(nump)`, `free(planetp)` (la quale libera l'intera struttura a cui fa riferimento `planetp`).
+
+### Liste concatenate
+
+Una lista concatenata è una catena di nodi nella quale ogni nodo è collegato, o concatenato al nodo successivo. Segue la descrizione di una lista concatenata con tre nodi: in tutti i nodi, fatta eccezione dell'ultimo, il campo `linkp` contiene l'indirizzo del nodo successivo nella lista.
+
+```text
+    **********   
+    *    |   *      current     volts      linkp        current     volts      linkp        current     volts      linkp
+    *****|****     ********** ********** **********    ********** ********** **********    ********** ********** **********  
+         |-------> *   AC\0  |    115   |     ----*----*-> DC\0  |    12    |     ----*----*-> AC\0  |    220    |    \   *        
+                   ********** ********** **********    ********** ********** **********    ********** ********** **********
+```
+
+
+
+
+
+
+
+
+
+
 
 ## Programmazione in grande
 
@@ -1300,8 +1327,126 @@ Nella direttiva al preprocessore `#include` abbiamo finora sempre usato le paren
 #define ARR_UTILS_MAX_SIZE 40
 ```
 
+### Variabili globali
 
+Il linguaggio C permette la dichiarazione di variabili globali le quali vengono dichiarate nello stesso modo di una variabile classica con l'unica differenza che sono nel livello più alto al di fuori di ogni sottoprogramma cosicchè la visibilità di esse comprenda tutto il codice sorgente. Nonostante spesso sia inevitabile l'utilizzo di variabili globali, un accesso ad esse senza restrizioni è generalmente sconsigliato poichè considerato dannoso e va contro le prerogativa del codice e dei suoi sottoprogrammi che devono avere accesso solamente ai dati che hanno necessità di conoscere, seguendo l'interfaccia documentata e rappresentata dal prototipo del sottoprogramma. Una soluzione è quella di rendere le variabili delle costanti
 
+```c
+#include <...>
+
+extern const int months = 12; /* per essere utilizzata da altri sorgenti */
+
+int main(int argc, char* argv[]) { ... }
+```
+
+### Classi di memorizzazione static e register
+
+```c
+int funFunction(int *tempValue) {
+
+    static int once = 0;
+    int many = 0;
+}
+```
+
+>Per ogni invocazione di `funFunction()` la variabile `many` viene inizializzata a zero ed ogni volta che `funFunction()` termina, `many` viene rilasciata. Al contrario, la variabile `static once` viene inizializzata e rilasciata una sola volta. Se `funFunction()` modifica il valore di `once`, tale valore modificato viene mantenuto nelle chiamate a seguire su `funFunction()`. NB: Utilizzare una variabile locale `static` per poi richiamare sulla stessa funzione dov'è contenuta è una pratica di programmazione sconsigliata poichè complica notevolmente la comprensibilità del codice.
+
+Per quanto riguarda classi di memorizzazione `register` è strettamente legata alla classe di memorizzazione `auto` e può essere applicata solo a parametri e variabili locali. Una variabile `register` avverte solo al compilatore che si accederà molto frequentemente a tale variabile e quindi sarebbe opportuno che venisse allocato uno spazio (caratterizzato da tempi di accesso molto piccoli) all'interno dell'unità centrale di elaborazione. Dei buoni candidati possono essere ad esempio delle variabili che scorrono array di grandi dimensioni;
+
+```c
+static double manyValues[69][420];
+register int row, col;
+```
+
+### Compilazione condizionale
+
+Un utilizzo delle direttive condizionali sono per tenere traccia dei comportamenti dei sottoprogrammi e per testing, molto utile così nel momento in cui non servono più basta cambiare il parametro di una macro che determina l'esecuzione di procedimenti di testing. Di seguito un semplice esempio di programma ricorsivo che traccia i valori di ogni chiamata ricorsiva: 
+
+```c
+/* 
+    (TRACE) non necessariamente in questo sorgente, può anche non esserci ma essere
+    definito da una libreria che abbiamo incluso con una direttiva al preprocessore 
+ */
+#define TRACE 1 
+
+int ricMultiply(int m, int n) {
+
+    int res;
+
+    #ifdef TRACE
+        printf(": Entering >> m = %d, n = %d\n", m, n);
+    #endif
+
+    /* caso base */
+    if(n == 1) {
+
+        res = m;
+
+    } else {
+
+        /* passo ricorsivo */
+		trace++;
+        res = m + ricMultiply(m, n - 1);
+
+		#ifdef TRACE
+        	printf(": Leaving >> m = %d, n = %d, res = %d\n", m, n, res);
+		#endif
+	}
+	 
+	return(res);
+}
+```
+
+>Altre direttive sono: `#ifndef` (contrario di `#ifdef`), `#elif, #else, #undef` (elimina la definizione di un particolare nome).
+
+### Passare parametri al programma principale
+
+Digitando l'eseguibile da terminale, binary che creiamo con il comando per chiamare il compilatore `gcc -o somePgrm somePgrm.c`, possiamo dargli dei parametri che vengono accettati dai parametri formali del nostro programma principale ovvero `int main(int argc, char* argv[])`:
+
+```sh
+>> somePgrm old.txt new.txt 
+```
+Ciò significa che `argv` avrà riempito i primi due elementi nel suo array.
+
+```c
+argv[0] = "old.txt"
+argv[1] = "new.txt"
+```
+
+>Possiamo quindi con questi parametri usarli nel nostro codice accedendo agli elementi di `argv[]`.
+
+### Definire macro costanti con parametri
+
+```c
+#define NOME_MACRO(parametro1, parametro2) /* corpo della macro */
+```
+>NB: prima delle parentesi non ci deve essere uno spazione poichè in quel caso avverrebbe una assegnazione ed la componente assegnata diverrebbe tutto quello che vi sta dopo lo spazio. Di seguito un esempio completo.
+
+```c
+#include <stdio.h>
+
+#define LABEL_PRINT_INT(label, num) printf("%s = %d", (label), (num))
+
+int main(void) {
+
+    int r = 5, t = 12;
+
+    LABEL_PRINT_INT("rabbit", r);
+    printf(" ");
+    LABEL_PRINT_INT("tiger", t + 2);
+
+    return (0);
+}
+```
+
+```txt
+(output)
+>> rabbit = 5 tiger = 14    
+```
+
+>Il passaggio che fa quando si riferisce alla macro si chiama espansione della macro.
+
+Per scrivere la definizione di una macro su più righe si mettono dei backslash `\` a fine riga tranne l'ultima.
 
 
 
