@@ -1290,11 +1290,13 @@ arrOfNums = (int *) calloc(size, sizeof(int));
 
 Per ripulire le celle nello heap si utilizza una chiamata a `free()` mettendo come argomento la cella che dev'essere liberata, per esempio `free(nump)`, `free(planetp)` (la quale libera l'intera struttura a cui fa riferimento `planetp`).
 
+>NB: La differenza fra `calloc()` e `malloc` è che la prima inizializza i valori a zero mentre `malloc()` lascia la memoria non inizializzata.
+
 ### Liste concatenate
 
 Una lista concatenata è una catena di nodi nella quale ogni nodo è collegato, o concatenato al nodo successivo. Segue la descrizione di una lista concatenata con tre nodi: in tutti i nodi, fatta eccezione dell'ultimo, il campo `linkp` contiene l'indirizzo del nodo successivo nella lista.
 
-```text
+```txt
     **********   
     *    |   *      current     volts      linkp        current     volts      linkp        current     volts      linkp
     *****|****     ********** ********** **********    ********** ********** **********    ********** ********** **********  
@@ -1302,15 +1304,156 @@ Una lista concatenata è una catena di nodi nella quale ogni nodo è collegato, 
                    ********** ********** **********    ********** ********** **********    ********** ********** **********
 ```
 
+Per costruire una lista dinamica concatenata dobbiamo usare nodi che abbiano un campo puntatore al loro interno. Possiamo allocare memoria di volta in volta per un nodo ed utilizzare il puntatore in esso contenuto per collegarlo al nodo successivo.
 
+```c
+typedef struct node_main {
 
+    char current[3];
+    int volts;
+    struct node_main *linkp; /* puntatore per linkare altri nodi */
 
+} node_t;
+```
 
+>Usiamo in questo caso il tipo `struct node_main *` nella dichiarazione di un campo per indicare che `linkp` fa riferimento ad un altro nodo dello stesso tipo; NB: dobbiamo scrivere `struct node_main` e non solamente `node_main` poichè il compilatore non ha ancora incontrato il nome `node_main`. Di seguito il codice per allocare in modo dinamico la struttura:
 
+```c
+node_t *n1_dyn, *n2_dyn;
 
+*n1_dyn = (node_t *) malloc(sizeof(node_t));
+strcpy(n1_dyn -> current, "AC");
+n1_dyn -> volts = 115;
 
+*n2_dyn = (node_t *) malloc(sizeof(node_t));
+strcpy(n2_dyn -> current, "DC");
+n2_dyn -> volts = 12;
+```
 
+Poichè i campi `linkp` sono rimasti non definiti e sono di tipo `note_t *` possono essere utilizzati per memorizzare l'indirizzo di una cella di memoria.
 
+```c
+n1_dyn -> linkp = n2_dyn;
+```
+
+>L'istruzione seguente copia l'indirizzo memorizzato in `n2_dyn` nel campo `linkp` del nodo cui si ha accesso tramite `n1_dyn`. Si conosco ora quindi due modi per raggiungere il valore `12` nel campo `volts` del secondo nodo, `n2_dyn -> volts` e `n1_dyn -> linkp -> volts`.
+
+Dato che il valore del campo `linkp` del secondo nodo non è stato ancora definito allochiamo un terzo nodo e memorizziamo il `linkp` il riferimento al nuovo nodo, di cui inizializziamo i campi dati:
+
+```c
+n2_dyn -> linkp = (node_t *) malloc(sizeof(node_t));
+strcpy(n2_dyn -> linkp -> current, "AC");
+n2_dyn -> linkp -> volts = 220;
+```
+
+A questo punto abbiamo ancora un campo `linkp` che non è definito, alla fine della lista. Chiaramente i dati ed i nodi ad un certo punto terminano, e così anche la lista deve terminare: serve un valore speciale per segnalare la fine della lista. In C, la lista vuota viene rappresentata tramite il puntatore a NULL:
+
+```c
+n2_dyn -> linkp -> linkp = NULL;
+```
+
+Riassumendo, la variabile di tipo puntatore `n1_dyn` fa riferimento al primo elemento della lista, chiamato anche "testa della lista" e tutti i programmi che conosco questo indirizzo saranno in grado di accedere agli elementi della lista. 
+
+Esempio di codice completo di una lista di note:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#define NOTE 4
+
+typedef struct nodes {
+
+    char note[NOTE];
+    struct nodes *linkp;
+
+} node_t;
+
+void createList(void) {
+
+    int i;
+
+    node_t *startScale, *current, *newNote;
+
+    startScale = (node_t *) malloc(sizeof(node_t));
+    scanf("%s", startScale -> note);
+    current = startScale; 
+    
+    for(i = 0; i < 7; ++i) {
+
+        /* alloco memoria */
+        newNote = (node_t *) malloc(sizeof(node_t));
+
+        /* impostiamo la coda */
+        newNote -> linkp = NULL;
+        
+        /* inizializzo la nota */
+        scanf("%s", newNote -> note);
+
+        /* collego il puntatore al nodo precedente */
+        current -> linkp = newNote;
+
+        /* aggiorno il puntatore */
+        current = newNote;
+    }
+
+    printf("\n");
+
+    while(startScale != NULL) {
+
+        printf("%s\n", startScale -> note);
+        startScale = startScale -> linkp;
+    }
+
+    printf("\n ");
+}
+
+int main() {
+
+    createList();
+
+    return (0);
+}
+```
+
+>NB: questo è un inserimento in coda!
+
+Per eseguire la ricerca di un elemento (in questo caso un intero) possiamo farlo implementando un ciclo oppure una soluzione ricorsiva:
+
+```c
+nodo_t* find(nodo_t* current, int target) {
+
+    while( (current != NULL) && (current -> value != target) ) {
+
+        current = current -> linkp;
+    }
+
+    return (current);
+}
+```
+
+>Il programma restituisce il puntatore al nodo, se l'elemento è trovato, altrimenti `NULL`. NB: dovessimo invertire l'ordine delle condizione ovvero in questo modo `(current -> value != target) && (current != NULL)` seguiremmo un puntatore a `NULL`. Di seguito la versione ricorsiva:
+
+```c
+nodo_t* find(nodo_t* current, int target) {
+
+    if ( (current == NULL) || (current -> value == target) ) {
+
+        return (current);
+    }
+
+    return find(current -> linkp, target);
+}
+```
+
+>Nel chiamante il risultato va assegnato ad un puntatore.
+
+Generalmente i passi per allocare elementi in testa ed in coda sono (utilizziamo le sintassi definite nei sorgenti precedenti per i vari puntatori):
+
+|in testa|in coda|
+|--|--|
+|( 1 ) Si alloca il nuovo nodo e si salva dentro il valore|( 1 ) Si alloca il nuovo nodo e si salva dentro il valore|
+|( 2 ) Si assegna al puntatore `linkp` del nuovo nodo la testa della lista (`startscale`)|( 2 ) Si assegna il puntatore `linkp` il valore `NULL` |
+|( 3 ) Si assegna il nuovo nodo al puntatore testa|( 3 ) Si scorre tutta la lista per arrivare all'ultimo elemento e sia assegna al suo `linkp` il nuovo nodo. NB: se la lista è vuota l'inserimento in coda diventa un inserimento in testa|
 
 ## Programmazione in grande
 
