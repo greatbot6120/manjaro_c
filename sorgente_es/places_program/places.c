@@ -6,6 +6,9 @@
 
 void newPlaces(void) {
 
+    places_t *starter = NULL;
+    places_t *ender = NULL;
+
     char selection;
 
     printf("Enter m for the menu or q to exit >> ");
@@ -16,7 +19,7 @@ void newPlaces(void) {
 
         case (PLACE_MENU):
 
-            viewMenu();
+            viewMenu(starter, ender);
             break;
         
         case (PLACE_QUIT):

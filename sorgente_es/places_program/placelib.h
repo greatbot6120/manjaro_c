@@ -3,6 +3,8 @@
     #define PLACELIB_H
 
     /* for debugging purposes*/
+    #define PLACE_AFFIRMATIVE 'y'
+    #define PLACE_NEGATIVE `n`
     #define PLACE_QUIT 'q'
     #define PLACE_MENU 'm'
     #define PLACE_TRACE 1
@@ -18,9 +20,9 @@
 
     } places_t;
 
-    void viewMenu(void);
-    void appendHead(places_t **currentHead);
-    void appendQueue(places_t **currentTail);
+    void viewMenu(places_t *headp, places_t *queue);
+    places_t* appendHead(places_t *currentHead);
+    places_t* appendQueue(places_t *currentTail);
     void viewRoute(places_t *currentView);
 
 #endif

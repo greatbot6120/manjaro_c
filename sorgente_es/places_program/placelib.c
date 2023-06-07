@@ -4,7 +4,12 @@
 #include <unistd.h>
 #include "placelib.h"
 
-void viewMenu(void) {
+/*
+ *   TODO:
+ *   - change scanf()s in selection of site to not skipping spaces 
+ */
+
+void viewMenu(places_t *headp, places_t *queue) {
     
     int menuSel;
     
@@ -25,12 +30,13 @@ void viewMenu(void) {
            "13. Caricare percorso da file binario\n"
            "14. Uscita\n\n"
            "Enter a selection (1-14) >> ");
-    
-    /* check right values */
-    for( scanf("%d", &menuSel); (menuSel < 1) || (menuSel > 14); scanf("%d", &menuSel) ) {
+    scanf("%d", &menuSel);
 
-        #ifdef PLACE_TRACE
-            printf(">> ERROR MENU SELECTION %s\n", PLACE_ERROR);
+    /* check right values */
+    if( (menuSel < 1) || (menuSel > 14) ) {
+        
+        #if PLACE_TRACE
+            printf(">> ERROR MENU SELECTION, NOT A VALID OPTION %s\n", PLACE_ERROR);
             exit(EXIT_FAILURE);
         #endif
     }
@@ -39,18 +45,44 @@ void viewMenu(void) {
 
         case (1):
             
-            places_t *headp;
-            appendHead(&headp);
+            headp = appendHead(headp);
+            viewMenu(headp, queue);
+            break;
 
         case (2):
 
-            places_t *queuep;
-            appendQueue(&queuep);
+            queue = appendQueue(queue);
+            viewMenu(headp, queue);
+            break;
         
         case (5):
 
-            places_t *headView;
-            viewRoute(headView);
+            if(headp != NULL) {
+
+                viewRoute(headp);
+            
+            } else {
+
+                #if PLACE_TRACE
+                    printf(">> ERROR, EMPTY LIST %s\n", PLACE_ERROR);
+                    exit(EXIT_FAILURE);
+                #endif
+            }
+            break;
+
+        case (14):
+
+            exit(EXIT_SUCCESS);
+
+        default:
+                
+                #if PLACE_TRACE
+                    printf(">> CASE NOT YET DEFINED %s\n", PLACE_ERROR);
+                    exit(EXIT_FAILURE);
+                #endif
+
+            exit(EXIT_SUCCESS);
+
 /*          
         case (3):
         case (4):
@@ -63,14 +95,11 @@ void viewMenu(void) {
         case (12):
         case (13):
 */
-        case (14):
-
-            exit(EXIT_SUCCESS);
     }
 }
 
 /* double pointer for propagating to caller actual parameter */
-void appendHead(places_t **currentHead) {
+places_t* appendHead(places_t *currentHead) {
 
     places_t *newSiteHead = malloc(sizeof(places_t));
     int tempX, tempY;
@@ -84,24 +113,23 @@ void appendHead(places_t **currentHead) {
         newSiteHead -> x = tempX;
         newSiteHead -> y = tempY;
 
-        #ifdef PLACE_TRACE
+        #if PLACE_TRACE
             printf(">> SUCCESSFULLY DEFINED NEW NODE ITEMS %s\n", PLACE_SUCCESS);
         #endif
 
-        newSiteHead -> linkp = *currentHead;
-        *currentHead = newSiteHead;
+        newSiteHead -> linkp = currentHead;
+        currentHead = newSiteHead;
 
-        #ifdef PLACE_TRACE
+        #if PLACE_TRACE
             printf(">> SITE APPENDED ON HEAD SUCCESSFULLY %s\n", PLACE_SUCCESS);
         #endif
     }
 
     printf("\n");
-    sleep(2);
-    viewMenu();
+    return (currentHead);
 }
 
-void appendQueue(places_t **currentTail) {
+places_t* appendQueue(places_t *currentTail) {
 
     places_t *newSiteTail, *tempNull; 
     newSiteTail = malloc(sizeof(places_t));
@@ -117,44 +145,43 @@ void appendQueue(places_t **currentTail) {
         newSiteTail -> y = tempY;
         newSiteTail -> linkp = NULL;
 
-        #ifdef PLACE_TRACE
+        #if PLACE_TRACE
             printf(">> SUCCESSFULLY DEFINED NEW NODE ITEMS %s\n", PLACE_SUCCESS);
         #endif
 
-        if(*currentTail == NULL) {
-            
-            *currentTail = newSiteTail;
+        if(currentTail == NULL) {
+
+            currentTail = newSiteTail;
         
         } else {
-            
-            /* searching for the last node */
-            for( tempNull = *currentTail; (tempNull -> linkp) != NULL; tempNull = tempNull -> linkp ) {
 
-                tempNull -> linkp = newSiteTail;                
+            for(tempNull = currentTail; (tempNull -> linkp) != NULL; tempNull = tempNull -> linkp ) {
+
+                tempNull -> linkp = newSiteTail;
             }
+
         }
 
-        #ifdef PLACE_TRACE
+        #if PLACE_TRACE
             printf(">> SITE APPENDED ON QUEUE SUCCESSFULLY %s\n", PLACE_SUCCESS);
         #endif
     }
 
     printf("\n");
-    sleep(2);
-    viewMenu();
+    return(currentTail);
+    /*viewMenu();*/
 }
 
 void viewRoute(places_t *currentView) {
 
     while(currentView != NULL) {
 
-        printf("Here are you're sites with coordinates:\n\tName: %s\n\tCoordinates: (%d,%d)\n",
+        printf("Here are you're sites with coordinates:\n\n\tName: %s\n\tCoordinates: (%d,%d)\n\n",
                currentView -> site, currentView -> x, currentView -> y);
 
         currentView = currentView -> linkp;
     }
 
     printf("\n");
-    sleep(2);
-    viewMenu();
+    /*viewMenu();*/
 }
