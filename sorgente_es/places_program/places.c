@@ -7,7 +7,6 @@
 void newPlaces(void) {
 
     places_t *starter = NULL;
-    places_t *ender = NULL;
 
     char selection;
 
@@ -19,7 +18,7 @@ void newPlaces(void) {
 
         case (PLACE_MENU):
 
-            viewMenu(starter, ender);
+            viewMenu(starter);
             break;
         
         case (PLACE_QUIT):

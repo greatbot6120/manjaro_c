@@ -9,7 +9,7 @@
  *   - change scanf()s in selection of site to not skipping spaces 
  */
 
-void viewMenu(places_t *headp, places_t *queue) {
+void viewMenu(places_t *headp) {
     
     int menuSel;
     
@@ -46,15 +46,27 @@ void viewMenu(places_t *headp, places_t *queue) {
         case (1):
             
             headp = appendHead(headp);
-            viewMenu(headp, queue);
+            viewMenu(headp);
             break;
 
         case (2):
 
-            queue = appendQueue(queue);
-            viewMenu(headp, queue);
+            headp = appendQueue(headp);
+            viewMenu(headp);
             break;
         
+        case (3):
+
+            headp = appendIndex(headp);
+            viewMenu(headp);
+            break;
+        
+        case (4):
+
+            headp = deletePlace(headp);
+            viewMenu();
+            break;
+
         case (5):
 
             if(headp != NULL) {
@@ -76,16 +88,14 @@ void viewMenu(places_t *headp, places_t *queue) {
 
         default:
                 
-                #if PLACE_TRACE
-                    printf(">> CASE NOT YET DEFINED %s\n", PLACE_ERROR);
-                    exit(EXIT_FAILURE);
-                #endif
+            #if PLACE_TRACE
+                printf(">> CASE NOT YET DEFINED %s\n", PLACE_ERROR);
+                exit(EXIT_FAILURE);
+            #endif
 
             exit(EXIT_SUCCESS);
 
 /*          
-        case (3):
-        case (4):
         case (6):
         case (7):
         case (8):
@@ -103,12 +113,11 @@ places_t* appendHead(places_t *currentHead) {
 
     places_t *newSiteHead = malloc(sizeof(places_t));
     int tempX, tempY;
-    
     if(newSiteHead != NULL) {
-        
+
         printf("Enter a new site >> ");
         scanf("%s", newSiteHead -> site);
-        printf("Enter %s coordinates x and y respectively separated by a blank >> ", newSiteHead -> site);
+        printf("Enter %s coordinates x and y respectively separated by a blank space >> ", newSiteHead -> site);
         scanf("%d%d", &tempX, &tempY);
         newSiteHead -> x = tempX;
         newSiteHead -> y = tempY;
@@ -117,11 +126,20 @@ places_t* appendHead(places_t *currentHead) {
             printf(">> SUCCESSFULLY DEFINED NEW NODE ITEMS %s\n", PLACE_SUCCESS);
         #endif
 
+        /* we assign at linkp the old head */
         newSiteHead -> linkp = currentHead;
-        currentHead = newSiteHead;
 
+        /* we assign the new head */
+        currentHead = newSiteHead;
+        
         #if PLACE_TRACE
             printf(">> SITE APPENDED ON HEAD SUCCESSFULLY %s\n", PLACE_SUCCESS);
+        #endif
+
+    } else {
+
+        #if PLACE_TRACE
+            printf(">> ERROR, NOT ENOUGH MEMORY (POINTER TO NULL) %s\n", PLACE_ERROR);
         #endif
     }
 
@@ -129,54 +147,207 @@ places_t* appendHead(places_t *currentHead) {
     return (currentHead);
 }
 
-places_t* appendQueue(places_t *currentTail) {
+places_t* appendIndex(places_t *currentHead) {
 
-    places_t *newSiteTail, *tempNull; 
-    newSiteTail = malloc(sizeof(places_t));
-    int tempX, tempY;
-    
-    if(newSiteTail != NULL) {
+    places_t *tempNull;
+    places_t *newSiteIndex = malloc(sizeof(places_t));
+    int tempX, tempY, index;
+
+    if(newSiteIndex != NULL) {
         
+        printf("Enter the site index >> ");
+        scanf("%d", &index);
+        printf("Enter a new site >> ");
+        scanf("%s", newSiteIndex -> site);
+        printf("Enter %s coordinates x and y respectively separated by a blank space >> ", newSiteIndex -> site);
+        scanf("%d%d", &tempX, &tempY);
+        newSiteIndex -> x = tempX;
+        newSiteIndex -> y = tempY;
+        newSiteIndex -> linkp = NULL;
+
+        if(currentHead == NULL) {
+
+            currentHead = newSiteIndex;
+
+            #if PLACE_TRACE
+                printf(">> SITE APPENDED ON HEAD BECAUSE POINTER WAS NULL %s\n", PLACE_SUCCESS);
+            #endif
+        
+        } else {
+
+            tempNull = currentHead;
+
+            /* index from zero like in arrays*/
+            while(index > 1) {
+
+                if(tempNull -> linkp != NULL) {
+
+                    tempNull = tempNull -> linkp;
+                    --index;
+                
+                } else {
+
+                    #if PLACE_TRACE
+                        printf(">> INDEX OUT OF BOUNDS %s\n", PLACE_ERROR);
+                        exit(EXIT_FAILURE);
+                    #endif
+                }
+            }
+            
+            newSiteIndex -> linkp = tempNull -> linkp;
+            tempNull -> linkp = newSiteIndex;
+
+            #if PLACE_TRACE
+                printf(">> SITE APPENDED ON INDEX SUCCESSFULLY %s\n", PLACE_SUCCESS);
+            #endif
+        }   
+    }
+
+    printf("\n");
+    return (currentHead);
+}
+
+places_t* appendQueue(places_t *currentHead) {
+
+    places_t *tempNull;
+    places_t *newSiteTail = malloc(sizeof(places_t));
+    int tempX, tempY;
+
+    if(newSiteTail != NULL) {
+
         printf("Enter a new site >> ");
         scanf("%s", newSiteTail -> site);
-        printf("Enter %s coordinates x and y respectively separated by a blank >> ", newSiteTail -> site);
+        printf("Enter %s coordinates x and y respectively separated by a blank space >> ", newSiteTail -> site);
         scanf("%d%d", &tempX, &tempY);
         newSiteTail -> x = tempX;
         newSiteTail -> y = tempY;
         newSiteTail -> linkp = NULL;
-
+        
         #if PLACE_TRACE
             printf(">> SUCCESSFULLY DEFINED NEW NODE ITEMS %s\n", PLACE_SUCCESS);
         #endif
 
-        if(currentTail == NULL) {
+        if(currentHead == NULL) {
 
-            currentTail = newSiteTail;
-        
+            currentHead = newSiteTail;
+
+            #if PLACE_TRACE
+                printf(">> SITE APPENDED ON HEAD BECAUSE POINTER WAS NULL %s\n", PLACE_SUCCESS);
+            #endif
+
         } else {
+            
+            tempNull = currentHead;
 
-            for(tempNull = currentTail; (tempNull -> linkp) != NULL; tempNull = tempNull -> linkp ) {
+            while(tempNull -> linkp != NULL) {
 
-                tempNull -> linkp = newSiteTail;
+                tempNull = tempNull -> linkp;
             }
 
+            tempNull -> linkp = newSiteTail;
+            
+            #if PLACE_TRACE
+                printf(">> SITE APPENDED ON QUEUE SUCCESSFULLY %s\n", PLACE_SUCCESS);
+            #endif
         }
 
+    } else {
+        
         #if PLACE_TRACE
-            printf(">> SITE APPENDED ON QUEUE SUCCESSFULLY %s\n", PLACE_SUCCESS);
+            printf(">> ERROR, OUT OF MEMORY %s\n", PLACE_ERROR);
+            exit(EXIT_FAILURE);
         #endif
     }
 
     printf("\n");
-    return(currentTail);
+    return(currentHead);
     /*viewMenu();*/
 }
 
+places_t* deletePlace(places_t *currentHead) {
+
+    places_t *tempNull;
+    int index;
+
+    printf("Enter the index of the site to delete >> ");
+    scanf("%d", &index);
+    
+    if(currentHead != NULL) {
+
+        tempNull = currentHead;
+
+        while(index > 1) {
+
+            if(tempNull -> linkp != NULL) {
+
+                tempNull = tempNull -> linkp;
+                --index;
+
+            } else {
+
+                #if PLACE_TRACE
+                    printf(">> INDEX OUT OF BOUNDS %s\n", PLACE_ERROR);
+                    exit(EXIT_FAILURE);
+                #endif
+            }
+        }
+
+        /* if we are trying to delete on head */
+        if(tempNull == currentHead) {
+            
+            /* if we are trying to delete on head AND it's the only element in the list */
+            if(currentHead -> linkp != NULL) {
+
+                currentHead = currentHead -> linkp;
+            }
+
+            free(tempNull);
+
+        } else if() {
+
+            /* if we are trying to delete on queue */
+            
+
+
+        }
+        
+        
+        
+        
+
+    } else {
+
+        #if PLACE_TRACE
+            printf(">> ERROR, EMPTY LIST NOTHING TO DEALLOCATE %s\n", PLACE_ERROR);
+            exit(EXIT_FAILURE);
+        #endif
+
+    }
+
+
+
+
+
+
+
+
+
+    return(currentHead);
+}
+
+
+
+
+
+
+
 void viewRoute(places_t *currentView) {
+
+    printf("Here are you're sites with coordinates:\n\n");
 
     while(currentView != NULL) {
 
-        printf("Here are you're sites with coordinates:\n\n\tName: %s\n\tCoordinates: (%d,%d)\n\n",
+        printf("\tName: %s\n\tCoordinates: (%d,%d)\n\n",
                currentView -> site, currentView -> x, currentView -> y);
 
         currentView = currentView -> linkp;

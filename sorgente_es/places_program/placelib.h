@@ -20,9 +20,11 @@
 
     } places_t;
 
-    void viewMenu(places_t *headp, places_t *queue);
+    void viewMenu(places_t *headp);
     places_t* appendHead(places_t *currentHead);
-    places_t* appendQueue(places_t *currentTail);
+    places_t* appendIndex(places_t *currentHead);
+    places_t* appendQueue(places_t *currentHead);
+    places_t* deletePlace(places_t *currentHead);
     void viewRoute(places_t *currentView);
 
 #endif
